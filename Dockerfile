@@ -4,11 +4,14 @@ FROM node:latest
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY . .
+# Copy only package.json and package-lock.json to the container
+COPY package*.json ./
 
-# Install any needed dependencies specified in package.json
+# Install dependencies
 RUN npm install
+
+# Copy the rest of the application files
+COPY . .
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
