@@ -33,7 +33,11 @@ function update() {
 
     context.clearRect(0, 0, board.width, board.height);
     context.fillStyle = "red";
-    context.fillRect(foodX, foodY, blockSize, blockSize);
+    context.beginPath();
+    context.arc(foodX + blockSize / 2, foodY + blockSize / 2, blockSize / 2, 0, Math.PI * 2);
+    context.fillStyle = "red";
+    context.fill();
+    context.closePath();
 
     if (snakeX === foodX && snakeY === foodY) {
         snakeBody.push([foodX, foodY]);
