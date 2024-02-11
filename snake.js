@@ -3,7 +3,7 @@ var rows = 20;
 var cols = 30;
 var board;
 var context; 
-
+// added comment
 var snakeX = blockSize * 5;
 var snakeY = blockSize * 5;
 var velocityX = 0;
