@@ -14,10 +14,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
     - name: Build the Docker image
       run: |
-        docker build . --file Dockerfile --tag snakejs:$(date +%s)
-        docker tag snakejs:$(date +%s) samdroberts/snakejs:latest
+        timestamp=$(date +%s)
+        docker build . --file Dockerfile --tag samdroberts/snakejs:$timestamp
+        docker tag samdroberts/snakejs:$timestamp samdroberts/snakejs:latest
     - name: Log in to Docker Hub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
     - name: Push Docker image to Docker Hub
