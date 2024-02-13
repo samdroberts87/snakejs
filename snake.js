@@ -14,7 +14,7 @@ var foodY;
 var gameOver = false;
 var score = 0;
 var highScore = localStorage.getItem("highScore") || 0;
-
+// comment
 window.onload = function() {
     board = document.getElementById("board");
     board.height = rows * blockSize;
