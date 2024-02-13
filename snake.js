@@ -3,7 +3,6 @@ var rows = 20;
 var cols = 30;
 var board;
 var context; 
-// added comment
 var snakeX = blockSize * 5;
 var snakeY = blockSize * 5;
 var velocityX = 0;
@@ -14,7 +13,6 @@ var foodY;
 var gameOver = false;
 var score = 0;
 var highScore = localStorage.getItem("highScore") || 0;
-// comment
 window.onload = function() {
     board = document.getElementById("board");
     board.height = rows * blockSize;
