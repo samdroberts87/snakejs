@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_IMAGE = 'samdroberts/snakejs'
+    }
+    
+    stages {
+        stage('Integration') {
+            steps {
+                // Delete the snakejs directory if it exists
+                sh 'rm -rf /var/lib/jenkins/workspace/first-integration/snakejs'
+
+
+                
+                // Checkout code from GitHub using credentials
+                sh 'git clone https://github.com/samdroberts87/snakejs.git'
+            }
+        }
+        
+        stage('Deployment') {
+            steps {
+                
+                // Push Docker image to Docker Hub using credentials
+                script {
+                    def dockerImage = 'samdroberts/snakejs'
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker_hub') {
+                        docker.image(dockerImage).push('latest')
+                        sh 'echo image made and pushed to dockerhub'
+                        sh 'sleep 15'
+                        sh 'docker pull samdroberts/snakejs'
+                        sh 'sleep 15'
+                        sh 'echo pulled docker image'
+                        sh 'docker run -d -p 8081:80 samdroberts/snakejs' 
+                    }
+                }
+            }
+        }
+        stage('run container in browser') {
+            steps {
+                script {
+                    
+                    sh 'sleep 10'
+                    sh 'echo slept again'
+                    withEnv(['DISPLAY=:0']) {
+                    sh '/usr/bin/opera --start-maximized --new-window http://localhost:8081'
+
+                    }
+                }
+            }    
+        }
+    }
+}
