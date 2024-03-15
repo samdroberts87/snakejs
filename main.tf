@@ -17,6 +17,7 @@ resource "aws_instance" "app_server" {
   ami           = "ami-08f7912c15ca96832"
   instance_type = "t2.micro"
   key_name      = "Pipeline"
+  security_groups = [sg-02dd272262f14a262"]
 
   tags = {
     Name = "snake_game_server"
