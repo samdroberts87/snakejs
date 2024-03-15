@@ -17,7 +17,7 @@ resource "aws_instance" "app_server" {
   ami             = "ami-08f7912c15ca96832"
   instance_type   = "t2.micro"
   key_name        = "Pipeline"  # Ensure this matches the case of the actual key pair name in AWS
-  vpc_security_groups_ids = ["sg-02dd272262f14a262"]
+  vpc_security_group_ids = ["sg-02dd272262f14a262"]
 
   tags = {
     Name = "snake_game_server"
