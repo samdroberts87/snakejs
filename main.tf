@@ -16,22 +16,18 @@ provider "aws" {
 resource "aws_instance" "app_server" {
   ami           = "ami-08f7912c15ca96832"
   instance_type = "t2.micro"
-  key_name      = "pipeline"
+  key_name      = "pipeline" // Ensure this matches your existing key pair name
 
   tags = {
     Name = "snake_game_server"
   }
 }
 
-data "aws_key_pair" "pipeline" {
-  key_name = "pipeline"
-}
-
 resource "null_resource" "save_output_to_file" {
   provisioner "local-exec" {
     command = <<EOT
-echo "server_name=${aws_instance.app_server.tags.Name} server_IP=${aws_instance.app_server.public_ip} ssh_private_key_file=pipeline.pem" > inventory.ini
-aws ec2 create-key-pair --key-name pipeline --query 'KeyMaterial' --output text > pipeline.pem
+echo "server_name=snake_game_server server_IP=${aws_instance.app_server.public_ip} ssh_private_key_file=pipeline.pem" > inventory.ini
+aws ec2 get-key-pair --key-name pipeline --query 'KeyPairs[0].KeyMaterial' --output text > pipeline.pem
 EOT
   }
 }
