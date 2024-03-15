@@ -23,17 +23,15 @@ resource "aws_instance" "app_server" {
   }
 }
 
-output "Name" {
-  value = aws_instance.app_server.tags.Name
-}
-
-output "public_ip" {
-  value = aws_instance.app_server.public_ip
+data "aws_key_pair" "pipeline" {
+  key_name = "pipeline"
 }
 
 resource "null_resource" "save_output_to_file" {
   provisioner "local-exec" {
-    command = "echo \"server_name=${aws_instance.app_server.tags.Name} server_IP=${aws_instance.app_server.public_ip} ssh_private_key_file=pipeline.pem\" > inventory.ini"
+    command = <<EOT
+echo "server_name=${aws_instance.app_server.tags.Name} server_IP=${aws_instance.app_server.public_ip} ssh_private_key_file=pipeline.pem" > inventory.ini
+aws ec2 create-key-pair --key-name pipeline --query 'KeyMaterial' --output text > pipeline.pem
+EOT
   }
 }
-
