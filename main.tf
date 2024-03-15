@@ -16,7 +16,7 @@ provider "aws" {
 resource "aws_instance" "app_server" {
   ami           = "ami-08f7912c15ca96832"
   instance_type = "t2.micro"
-  key_name      = "pipeline"
+  key_name      = "Pipeline"
 
   tags = {
     Name = "snake_game_server"
@@ -33,6 +33,6 @@ output "public_ip" {
 
 resource "null_resource" "save_output_to_file" {
   provisioner "local-exec" {
-    command = "echo \"server_name=${aws_instance.app_server.tags.Name} server_IP=${aws_instance.app_server.public_ip} ssh_private_key_file=pipeline.pem\" > inventory.ini"
+    command = "echo \"server_name=${aws_instance.app_server.tags.Name} server_IP=${aws_instance.app_server.public_ip} ssh_private_key_file=Pipeline.pem\" > inventory.ini"
   }
 }
