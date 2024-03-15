@@ -1,58 +1,31 @@
 ---
 - name: Install Docker and run container
-  hosts: "{{ server_name }}"
-  gather_facts: false
+  hosts: all
   become: true
   tasks:
-    - name: Update apt package index
+    - name: Update apt package cache
       apt:
         update_cache: yes
-      when: ansible_os_family == 'Debian'
-
-    - name: Install required system packages
-      package:
-        name: "{{ item }}"
-        state: present
-      with_items:
-        - apt-transport-https
-        - ca-certificates
-        - curl
-        - software-properties-common
-        - gnupg-agent
-      when: ansible_os_family == 'Debian'
-
-    - name: Add Docker GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-      when: ansible_os_family == 'Debian'
-
-    - name: Add Docker APT repository
-      apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
-      when: ansible_os_family == 'Debian'
 
     - name: Install Docker
-      package:
-        name: docker-ce
+      apt:
+        name: docker.io
         state: present
-      when: ansible_os_family == 'Debian'
 
-    - name: Start Docker service
-      service:
+    - name: Install python3-pip
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install Docker python package
+      pip:
         name: docker
-        state: started
-      when: ansible_os_family == 'Debian'
-
-    - name: Pull Docker image
-      docker_image:
-        name: samdroberts/snakejs
-        source: pull
+        state: present
 
     - name: Run Docker container
       docker_container:
-        name: snakejs_container
+        name: snake_game_container
         image: samdroberts/snakejs
-        state: started
-        restart_policy: always
         ports:
           - "8081:80"
+        state: started
