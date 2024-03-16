@@ -1,1 +1,125 @@
-
+pipeline {
+    agent any    
+    environment {
+        AWS_DEFAULT_REGION="us-west-2"
+        THE_BUTLER_SAYS_SO=credentials('aws')
+    }
+    stages {
+        stage('Pull resources from GitHub') {
+            steps {
+                script {
+                    if (fileExists('/var/lib/jenkins/workspace/pipeline-project/snakejs')) {
+                        sh 'rm -rf /var/lib/jenkins/workspace/pipeline-project/snakejs && echo removed'
+                    }
+                    sh '''
+                        git clone https://github.com/YOURGITHUBUSERNAME/snakejs.git
+                        sleep 10
+                        echo Pulled
+                    '''
+                }
+            }
+        }
+        stage('Copy key-pair into working directory') {
+            steps {
+                dir("/var/lib/jenkins/workspace/pipeline-project/snakejs/") {
+                    script {
+                        sh '''
+                            cp /var/lib/jenkins/workspace/Pipeline.pem .
+                            chmod 600 Pipeline.pem
+                        '''
+                    }
+                }   
+            }
+        }
+        stage('Build new Docker image') {
+            steps {
+                dir("/var/lib/jenkins/workspace/pipeline-project/snakejs/") {
+                    script {
+                        sh '''
+                            docker build -t snakejsapp .
+                            docker tag snakejsapp <YOURDOCKERUSERNAME>/snakejsapp
+                            echo Image built
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Push Docker image to Docker Hub repository') {
+            steps {
+                script {
+                    def dockerImage = '<yourdockerusername>/snakejsapp'
+                    docker.withRegistry('https://index.docker.io/v1/', 'docker') {
+                        docker.image(dockerImage).push('latest')
+                        sh 'echo Image pushed to Docker Hub'
+                        sh 'sleep 10'
+                    }
+                }
+            }
+        }
+        stage('Create EC2 instance with Terraform, output key pair and public IP, generate local inventory.ini file') {
+            steps {
+                dir("/var/lib/jenkins/workspace/pipeline-project/snakejs") {
+                    script {
+                        sh '''
+                            terraform init
+                            echo Initialized
+                            sleep 5
+                            terraform apply -auto-approve
+                        '''
+                        // Extract information from the inventory file
+                        def inventoryFile = readFile('inventory.ini').trim()
+                        def serverName = inventoryFile.split(' ')[0].split('=')[1]
+                        def serverIP = inventoryFile.split(' ')[1].split('=')[1]
+                        def sshPrivateKey = '/var/lib/jenkins/workspace/pipeline-project/snakejs/' + inventoryFile.split(' ')[2].split('=')[1]
+                        
+                        // Create ansible_inventory.ini for Ansible
+                        def ansibleInventory = "[${serverName}]\n${serverIP} ansible_ssh_private_key_file=${sshPrivateKey} ansible_user=ubuntu"
+                        writeFile file: '/var/lib/jenkins/workspace/pipeline-project/snakejs/ansible_inventory.ini', text: ansibleInventory
+                    }
+                }
+            }
+        }
+        stage('Rest to ensure EC2 ready for connection'){
+            steps {
+                sh 'sleep 30'
+            }
+        }
+        stage('Connect to EC2 via SSH, exchange key') {
+            steps {
+                script {
+                    def inventoryFile = readFile('/var/lib/jenkins/workspace/pipeline-project/snakejs/inventory.ini').trim()
+                    def serverIP = inventoryFile.split('server_IP=')[1]
+                    def publicKeyPath = "/home/user1/.ssh/id_rsa.pub"
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/workspace/pipeline-project/snakejs/Pipeline.pem ubuntu@''' + serverIP + ''' "echo 'Connection made'; cat YOURPUBLICKEY >> ~/.ssh/authorized_keys; echo 'public key added to EC2'"
+                    '''
+                }
+            }
+        }
+        stage('Run Ansible playbook') {
+            steps {
+                dir("/var/lib/jenkins/workspace/pipeline-project/snakejs") {   
+                    script {
+                        // Execute Ansible playbook
+                        sh '''
+                            ansible-playbook -i /var/lib/jenkins/workspace/pipeline-project/snakejs/ansible_inventory.ini /var/lib/jenkins/workspace/pipeline-project/snakejs/docker_playbook.yml
+                        '''
+                    }
+                }
+            }
+        }
+        stage('Output IP/port map to access web app') {
+            steps {
+                dir("/var/lib/jenkins/workspace/pipeline-project/snakejs") {
+                    script {
+                        def inventoryFile = readFile('inventory.ini').trim()
+                        def serverName = inventoryFile.split(' ')[0].split('=')[1]
+                        def serverIP = inventoryFile.split(' ')[1].split('=')[1]
+                        def link = "<a href=\"http://${serverIP}:8081\"> http://${serverIP}:8081 </a>"
+                        echo "${link}"
+                    }
+                }
+            }
+        }
+    }
+}
