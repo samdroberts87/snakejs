@@ -1,3 +1,7 @@
+this pipeline will 
+pull from YOUR gothub repo > create and push docker image to YOUR dockerhub repo > create an EC2 with terraform > configure the EC2 with ansible > output the url for you to access the webapp
+
+
 in order for this to work out of the box (ish) you'll need to install several items on your jenkins server, install plugins on juenkins, set up credentials named as they are specified here and edit some file paths etc. You'll also need to create a key pair on amazon. I'll explain all here:
 
 install on the jenkins server
