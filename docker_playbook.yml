@@ -1,6 +1,6 @@
 ---
 - name: Install Docker and run container
-  hosts: all
+  hosts: snake_game_server
   become: true
   tasks:
     - name: Update apt package cache
