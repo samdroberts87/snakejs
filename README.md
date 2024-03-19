@@ -12,9 +12,9 @@ This pipeline automates the deployment process for your web application. It pull
 ## Setup Instructions:
 
 Run the following command to start the custom Jenkins image inside a Docker container:
-
+```
 docker run -v /var/run/docker.sock:/var/run/docker.sock -it -p 8080:8080 samdroberts/jenkinsimage
-
+```
 IMPORTANT - do not exit out of this terminal or the jenkins server will stop.
 
 1. Configure the following inside the container's CLI (whihc will have opened after the run command):
