@@ -19,14 +19,14 @@ IMPORTANT - do not exit out of this terminal or the jenkins server will stop.
 
 1. Configure the following inside the container's CLI (whihc will have opened after the run command):
 
-- **AWS-cli:** Run `aws configure` and enter your AWS IAM details. Set your region to `us-west-2`. 
+- **AWS-cli:** Run ```aws configure``` and enter your AWS IAM details. Set your region to `us-west-2`. 
     Following this, add your access and secret keys as environmental variables using the following commands:
   ```
   export AWS_ACCESS_KEY_ID=REPLACETHISWITHYOURACCESSKEY 
   export AWS_SECRET_ACCESS_KEY=REPLACETHISWITHYOURSECRETKEY
   ```
-- **Docker:** Run `docker login` and enter your DockerHub details.
-- **Start jenkins:** Run `service jenkins start && cat /var/lib/jenkins/secrets/initialAdminPassword` and make a note of the output, you'll need this for jenkins.
+- **Docker:** Run ```docker login``` and enter your DockerHub details.
+- **Start jenkins:** Run ```service jenkins start && cat /var/lib/jenkins/secrets/initialAdminPassword``` and make a note of the output, you'll need this for jenkins.
 
 
 2. Access and configure Jenkins by navigating to http://localhost:8080 in your web browser and, when prompted, paste the password from the ooutput of your last commad.
@@ -56,7 +56,7 @@ IMPORTANT - do not exit out of this terminal or the jenkins server will stop.
 - Give short description and scroll to the Groovy script part. Paste the code from the jenkinsfile in this github repository.
 - Update the following:
   - Docker: Replace `YOURDOCKERUSERNAME` with your actual DockerHub username.
-  - SSH: Create an SSH key pair on your host machine (not in the container cli, use a different terminal session to do this) with following command `ssh-keygen` and hit enter each time when promted to leave settings as default. Your file will then be saved in the default directory and will be accesible with the following command `cat ~/.ssh/id_rsa.pub`. Paste the output of this command in the pipeline's `YOURPUBLICKEY` section.
+  - SSH: Create an SSH key pair on your host machine (not in the container cli, use a different terminal session to do this) with following command ```ssh-keygen``` and hit enter each time when promted to leave settings as default. Your file will then be saved in the default directory and will be accesible with the following command ```cat ~/.ssh/id_rsa.pub```. Paste the output of this command in the pipeline's `YOURPUBLICKEY` section.
 
 8. Other AWS configurations:
 - Create a new key pair named `Pipeline` from the AWS Management Console. Save the downloaded Pipeline.pem file into the `/var/lib/jenkins/workspace` directory of the container. The pipeline will pull this in as part of the process.
