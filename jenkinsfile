@@ -12,7 +12,7 @@ pipeline {
                         sh 'rm -rf /var/lib/jenkins/workspace/pipeline-project/snakejs && echo removed'
                     }
                     sh '''
-                        git clone https://github.com/YOURGITHUBUSERNAME/snakejs.git
+                        git clone https://github.com/samdroberts87/snakejs.git
                         sleep 10
                         echo Pulled
                     '''
