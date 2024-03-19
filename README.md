@@ -1,6 +1,6 @@
 # README: Automated Deployment Pipeline Setup
 
-This pipeline automates the deployment process for your web application. It pulls code from a specified GitHub repository, creates and pushes a Docker image to your DockerHub repository, provisions an EC2 instance with Terraform, configures the EC2 instance with Ansible, and provides the URL for accessing the web application.
+This pipeline automates the deployment process for your web application. It pulls code from this GitHub repository, creates and pushes a Docker image to your DockerHub repository, provisions an EC2 instance with Terraform, configures the EC2 instance with Ansible, and provides the URL for accessing the web application.
 
 ## Prerequisites:
 
@@ -8,6 +8,7 @@ This pipeline automates the deployment process for your web application. It pull
 - dockerhub account
 - Make sure there's no application running on port 8080 on your host machine.
 - Have docker engine installed on your host machine
+- You DO NOT need pre-existing knowledge of the tools on show here. This walks you through everything!
 
 ## Setup Instructions:
 
