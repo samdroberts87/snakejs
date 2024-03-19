@@ -1,5 +1,5 @@
 this pipeline will 
-pull from YOUR gothub repo > create and push docker image to YOUR dockerhub repo > create an EC2 with terraform > configure the EC2 with ansible > output the url for you to access the webapp
+pull from this github repo > create and push docker image to YOUR dockerhub repo > create an EC2 with terraform > configure the EC2 with ansible > output the url for you to access the webapp
 
 
 in order for this to work out of the box (ish) you'll need to configure the installed applications in the container and configure your credentials in jenkins. You'll also need to make sure you don't have anything running on port 8080 on your host machine.
