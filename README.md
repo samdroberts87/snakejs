@@ -1,36 +1,48 @@
-this pipeline will 
-pull from this github repo > create and push docker image to YOUR dockerhub repo > create an EC2 with terraform > configure the EC2 with ansible > output the url for you to access the webapp
+# README: Automated Deployment Pipeline Setup
 
+This pipeline automates the deployment process for your web application. It pulls code from a specified GitHub repository, creates and pushes a Docker image to your DockerHub repository, provisions an EC2 instance with Terraform, configures the EC2 instance with Ansible, and provides the URL for accessing the web application.
 
-in order for this to work out of the box (ish) you'll need to configure the installed applications in the container and configure your credentials in jenkins. You'll also need to make sure you don't have anything running on port 8080 on your host machine.
+## Prerequisites:
 
-To start with, you will run the following command to run a custom jenkins image inside a docker container:
+- You need a AWS account (free tier is enough)
+- dockerhub account
+- Make sure there's no application running on port 8080 on your host machine.
+
+## Setup Instructions:
+
+1. Run the following command to start the custom Jenkins image inside a Docker container:
+
 docker run -v /var/run/docker.sock:/var/run/docker.sock -it -p 8080:8080 samdroberts/jenkinsimage
-and use your hosts docker to run the docker commands inside the container (so if you haven't already, you'll need the docker engine installed on your host machine. This jenkins pipeline will run in this container. 
 
-I've done as much as possible but In order to get it to work, you'll need to configure the following:
-
-first, From the cli of the container (which will have opened after you punched in the docker run commad from above:
-- AWS-cli - Run the following command: aws configure -  then enter your aws IAM details (make sure you've given your IAM full EC2 access and set your region to us-west-2) also add your public and secret keys as variables using the following commands:
-export AWS_ACCESS_KEY_ID=REPLACETHISWITHYOURACCESSKEY
-export AWS_SECRET_ACCESS_KEY=REPLACETHISWITHYOURSECRETKEY
-- docker  - with the following commands: docker login - then enter your dockerhub details
-
-  
-to enter and configure jenkins, go to your webbrowser at http://localhost:8080 and enter the username admin and password admin
-
-The next step is to configure your AWS & docker credentials in jenkins. Go into DASHBOARD > MANAGE JENKINS > CREDENTIALS >  and update the current credentials with yours. Leave the name of the credentials (aws & docker respectively) as they are. These names are referenced as variables in the groovy script. Just update the username & password for docker, and the access key and secret access key for aws.
-
-Next, you need to head to the pipeline and edit a few details.
-Go into the pipeline called "pipeline-project" and scroll to the groovy script. 
-Here you'll need to update the following:
-* docker - Update the pipeline script with your username in the YOURDOCKERUSERNAME sections
-
-next, in your host machines cli, create an ssh key pair with the ssh-keygen command. Then, make a note of your public key with the following command cat ~/.ssh/id_rsa.pub. You'll need to paste this in the pipeline in the YOURPUBLICKEY section
+IMPORTANT - do not exit out of this terminal or the jenkins server will stop.
 
 
-other things to configure
-AWS - create a new key pair called Pipeline from the aws management console. Save the file into the /var/lib/jenkins/workspace directory of the container so that the pipeline can pull it into your working directory
-Go into your AWS management console and change your default security group to allow incomming traffic on port 22 for ssh and outgoing traffic http all. if you're worried about security you could configure a new security group but then you'll have to change the main.tf to assign the ec2 to that group. Up to you.
+2. Configure the following inside the container's CLI (whihc will have opened after the run command):
 
-I'm 99% sure this covers everything but if not, feel free to let me know what issues you have and i'm sure i'll be able to trouble shoot with you as i'll have had the same issues along the way to getting this to work.
+first, start Jenkins - 'service jenkins start'
+
+- **AWS-cli:** Run `aws configure` and enter your AWS IAM details. Set your region to `us-west-2`. 
+    Following this, add your access and secret keys as environmental variables using the following commands:
+  ```
+  export AWS_ACCESS_KEY_ID=REPLACETHISWITHYOURACCESSKEY 
+  export AWS_SECRET_ACCESS_KEY=REPLACETHISWITHYOURSECRETKEY
+  ```
+- **Docker:** Run `docker login` and enter your DockerHub details.
+
+4. Access and configure Jenkins by navigating to http://localhost:8080 in your web browser. Use the username `admin` and password `admin`.
+
+5. Configure AWS and Docker credentials in Jenkins:
+- Go to `DASHBOARD` > `MANAGE JENKINS` > `CREDENTIALS`.
+- Update the current credentials with yours, leaving the name as `aws` and `docker` respectively.
+
+6. Edit the pipeline details in Jenkins:
+- Go to the pipeline named "pipeline-project" and edit the Groovy script.
+- Update the following:
+  - Docker: Replace `YOURDOCKERUSERNAME` with your actual DockerHub username.
+  - SSH: Create an SSH key pair on your host machine (not in the container cli, use a different terminal session to do this) with following command `ssh-keygen`, then paste your public key in the pipeline's `YOURPUBLICKEY` section.
+
+7. Other AWS configurations:
+- Create a new key pair named `Pipeline` from the AWS Management Console. Save the file into the `/var/lib/jenkins/workspace` directory of the container. The pipeline will pull this in as part of the process.
+- Configure your default security group in the AWS Management Console to allow incoming traffic on port 22 for SSH and outgoing traffic HTTP all.
+
+**Note:** If you encounter any issues, feel free to troubleshoot with me. I've likely faced similar challenges while setting up this pipeline.
