@@ -28,7 +28,6 @@ IMPORTANT - do not exit out of this terminal or the jenkins server will stop.
 - **Docker:** Run ```docker login``` and enter your DockerHub details.
 - **Start jenkins:** Run ```service jenkins start && cat /var/lib/jenkins/secrets/initialAdminPassword``` and make a note of the output, you'll need this for jenkins.
 
-
 2. Access and configure Jenkins by navigating to http://localhost:8080 in your web browser and, when prompted, paste the password from the ooutput of your last commad.
 3. Complete user details as prompted and on the next page, select the "install reccomended plugins" option.
 4. Once completed and logged into jenkins dashboard, head to `MANAGE JENKINS` > `PLUGINS` >`AVAILABLE PLUGINS` and search for and install the following plugins:
