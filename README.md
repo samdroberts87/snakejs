@@ -1,4 +1,4 @@
-# README: Easiest CO/CD pipeline installation you'll ever use
+# README: Easiest CI/CD pipeline installation you'll ever use
 
 This pipeline automates the deployment process for your web application. It pulls code from this GitHub repository, creates and pushes a Docker image to your DockerHub repository, provisions an EC2 instance with Terraform, configures and deploys web app to the EC2 instance with Ansible, and provides the IP for accessing the web application.
 
