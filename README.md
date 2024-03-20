@@ -1,6 +1,6 @@
-# README: Automated Deployment Pipeline Setup
+# README: Easiest CO/CD pipeline installation you'll ever use
 
-This pipeline automates the deployment process for your web application. It pulls code from this GitHub repository, creates and pushes a Docker image to your DockerHub repository, provisions an EC2 instance with Terraform, configures the EC2 instance with Ansible, and provides the IP for accessing the web application.
+This pipeline automates the deployment process for your web application. It pulls code from this GitHub repository, creates and pushes a Docker image to your DockerHub repository, provisions an EC2 instance with Terraform, configures and deploys web app to the EC2 instance with Ansible, and provides the IP for accessing the web application.
 
 
 ## Prerequisites:
@@ -29,7 +29,7 @@ Navigate to your browser and head to AWS console to configure your AWS account:
 1. Configure the following inside the container's CLI (whihc will have opened after the run command):
 
 - **AWS-cli:** Run ```aws configure``` and enter your AWS IAM details. Set your region to `us-west-2`. 
-    Following this, add your access and secret keys as environmental variables using the following commands:
+    Following this, add your access and secret keys as environmental variables in the container using the following commands:
   ```
   export AWS_ACCESS_KEY_ID=REPLACETHISWITHYOURACCESSKEY 
   export AWS_SECRET_ACCESS_KEY=REPLACETHISWITHYOURSECRETKEY
@@ -37,9 +37,9 @@ Navigate to your browser and head to AWS console to configure your AWS account:
 - **Docker:** Run ```docker login``` and enter your DockerHub details.
 - **Start jenkins:** Run ```service jenkins start && cat /var/lib/jenkins/secrets/initialAdminPassword``` and make a note of the output, you'll need this for jenkins.
 
-2. Access and configure Jenkins by navigating to http://localhost:8080 in your web browser and, when prompted, paste the password from the ooutput of your last commad.
-3. Complete user details as prompted and on the next page, select the "install reccomended plugins" option.
-4. Once completed and logged into jenkins dashboard, head to `MANAGE JENKINS` > `PLUGINS` >`AVAILABLE PLUGINS` and search for and install the following plugins:
+2. Access and configure Jenkins by navigating to http://localhost:8080 in your web browser and, when prompted, paste the password from the output of your last command.
+3. Complete desired user login details when prompted and, on the next page, select the "install reccomended plugins" option.
+4. Once this has completed and you are logged into the jenkins dashboard, head to `MANAGE JENKINS` > `PLUGINS` >`AVAILABLE PLUGINS` and search for and install the following plugins:
    `Docker`, `Docker Pipeline`, `docker-build-step`, `CloudBees Docker Build and Publish`, `Terraform`, `Ansible`, `AWS Credentials`.
 5. Restart jenkins
 6. Configure AWS and Docker credentials in Jenkins:
@@ -60,13 +60,15 @@ Navigate to your browser and head to AWS console to configure your AWS account:
       Access key: `YOUR AWS ACCESS KEY`
       Secret Access Key: `YOUR AWS SECRET ACCESS KEY`        
 
-It's vital you follow the naming convention laid out above for aws & docker because they are reffered to in variables in the Groovy script. If you call them something else, it WONT work.
+It's vital you follow the naming convention laid out above for `aws` & `docker` `ID` because they are reffered to in variables within the Groovy script. If you call them something else, it WONT be able to find your credentials.
 
 7. Create pipeline:
 - `DASHBOARD` > `NEW ITEM` > `name your pipeline 'pipeline-project'` > `PIPELINE` > `OK`
-- Give short description and scroll to the Groovy script part. Paste the code from the jenkinsfile in this github repository.
+- Give short description and scroll to the Groovy script part (quick note, all other options are left defautl, you dont need to check any boxes).
+  Paste in the code found at this link - https://github.com/samdroberts87/snakejs/blob/main/jenkinsfile
 - Update the following parts of the groovy script:
   - Docker: Replace `YOURDOCKERUSERNAME` with your actual DockerHub username.
+  
   - Momentarily navigate away from Jenkins and to your terminal
   - SSH: Create an SSH key pair on your host machine (not in the container cli, use a different terminal session to do this) with following command ```ssh-keygen``` and hit enter each time when promted to leave settings as default. Your file will then be saved in the default directory and will be accesible with the following command ```cat ~/.ssh/id_rsa.pub```. Copy the output and head back to your browser, paste the output of this command in the pipeline's `YOURPUBLICKEY` section.
 
